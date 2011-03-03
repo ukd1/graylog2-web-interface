@@ -81,13 +81,7 @@ module ApplicationHelper
    "<script type='text/javascript'>
       function plot(data){
         $.plot($('#{options[:inject]}'),
-          [ {
-              color: '#fd0c99',
-              shadowSize: 10,
-              data: data,
-              points: { show: false, },
-              lines: { show: true, fill: true }
-          } ],
+          data,
           {
             xaxis: { mode: 'time' },
             grid: {

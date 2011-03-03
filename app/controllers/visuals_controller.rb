@@ -134,10 +134,33 @@ class VisualsController < ApplicationController
     stream = Stream.find(stream_id)
     
     return Array.new if stream.streamrules.blank?
-  
+
+    data = Array.new
+    data2 = Array.new
     Message.stream_counts_of_last_minutes(stream.id, hours.to_i*60).collect do |c|
-      [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
+      data << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
+      data2 << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count]+rand(50) ]
     end
+
+    ret = Array.new
+    
+    ret << {
+      "color" => "#000",
+      "shadowSize" => 0,
+      "data" => data2,
+      "points" => { "show" => false },
+      "lines" => { "show" => true, "fill" => false }
+    }
+    
+    ret << {
+      "color" => "#fd0c99",
+      "shadowSize" => 10,
+      "data" => data,
+      "points" => { "show" => false },
+      "lines" => { "show" => true, "fill" => false }
+    }
+
+    return ret
   end
 
   def escape(what)
