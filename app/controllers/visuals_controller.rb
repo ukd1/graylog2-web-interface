@@ -14,7 +14,7 @@ class VisualsController < ApplicationController
         when "totalgraph" then
           r["data"] = calculate_totalgraph(params[:hours])
         when "streamgraph" then
-          r["data"] = calculate_streamgraph(params[:stream_id], params[:hours])
+          r["data"] = calculate_streamgraph(params[:stream_ids], params[:hours])
       end
     end
 
@@ -130,36 +130,49 @@ class VisualsController < ApplicationController
     end
   end
   
-  def calculate_streamgraph(stream_id, hours=12)
-    stream = Stream.find(stream_id)
-    
-    return Array.new if stream.streamrules.blank?
+  def calculate_streamgraph(stream_ids, hours=12)
+    streams = Array.new
+    stream_ids.split(',').each do |id|
+      stream = Stream.find(id)
+      next if stream.streamrules.blank?
 
-    data = Array.new
-    data2 = Array.new
-    Message.stream_counts_of_last_minutes(stream.id, hours.to_i*60).collect do |c|
-      data << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
-      data2 << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count]+rand(50) ]
+      streams << stream
+    end
+    
+    return Array.new if streams.blank?
+
+    rows = Array.new
+    streams.each do |stream|
+      data = Array.new
+      Message.stream_counts_of_last_minutes(stream.id, hours.to_i*60).collect do |c|
+        data << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
+      end
+      rows << data
     end
 
     ret = Array.new
     
-    ret << {
-      "color" => "#000",
-      "shadowSize" => 0,
-      "data" => data2,
-      "points" => { "show" => false },
-      "lines" => { "show" => true, "fill" => false }
-    }
+    i = 0
+    rows.each do |row|
+      if i == 0
+        color = "#fd0c99"
+        filling = true
+        shadow = true
+      else
+        color = "#000"
+        filling = false
+        shadow = false
+      end
+      ret << {
+        "color" => color,
+        "shadowSize" => shadow,
+        "data" => row,
+        "points" => { "show" => false },
+        "lines" => { "show" => true, "fill" => filling }
+      }
+      i += 1
+    end
     
-    ret << {
-      "color" => "#fd0c99",
-      "shadowSize" => 10,
-      "data" => data,
-      "points" => { "show" => false },
-      "lines" => { "show" => true, "fill" => false }
-    }
-
     return ret
   end
 

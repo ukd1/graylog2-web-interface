@@ -24,7 +24,7 @@
 
 <%=raw flot_graph_loader(
     :inject => "#streams-analytics-new-messages",
-    :stream_id => @stream.id,
+    :stream_ids => params[:compare_with].blank? ? @stream.id : @stream.id.to_s + ",#{params[:compare_with]}",
     :hours => 12
   )
 %>
