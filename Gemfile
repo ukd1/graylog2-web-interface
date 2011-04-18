@@ -22,6 +22,8 @@ group :development, :test do
   # might be useful to generate fake data in development
   gem 'machinist_mongo', '~> 1.2.0', :require => 'machinist/mongoid'
   gem 'faker', '~> 0.9.5'
+
+  gem 'metric_fu', '~> 2.1.1'
 end
 
 group :test do
