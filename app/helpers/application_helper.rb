@@ -1,4 +1,10 @@
 module ApplicationHelper
+
+  # Returns formatted time
+  def time_to_formatted_s(t)
+    t.strftime('%Y-%m-%d %H:%M:%S.') + t.usec.to_s[0,3]
+  end
+
   def menu_item title, where
     current = String.new
     if where.instance_of?(Hash)

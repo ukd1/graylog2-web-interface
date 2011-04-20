@@ -5,15 +5,18 @@ class Message
 
   field :message,       :type => String
   field :full_message,  :type => String
-  field :created_at,    :type => Integer    # from server, UTC timestamp
-  field :timestamp,     :type => Integer    # from message, timestamp     # FIXME redefined below
-  field :date,          :type => String     # FIXME ???
-  field :facility,      :type => Object     # object?
-  field :level,         :type => Integer
+  field :created_at,    :type => Float    # stamped by server, UTC UNIX timestamp (seconds since epoch)
+  field :facility,      :type => String
+  field :level,         :type => Integer  # syslog level (0..7)
   field :host,          :type => String
   field :file,          :type => String
   field :line,          :type => Integer
   field :deleted,       :type => Boolean
+
+  # Returns +created_at+ as +Time+ in request's timezone
+  def created_at_time
+    @created_at_time ||= Time.zone.at(self.created_at)
+  end
 
   LIMIT = 100
 
@@ -30,11 +33,6 @@ class Message
 
   def self.find_by_id(_id)
     where(:_id => BSON::ObjectId(_id)).first
-  end
-
-  # FIXME ?!
-  def timestamp
-    Time.at(created_at)
   end
 
   # Overwriting the message getter. This always applies the filtering of
@@ -306,10 +304,6 @@ class Message
     end
 
     return ret_streams
-  end
-
-  def time
-    Time.at(self.created_at) rescue nil
   end
 
   def accessable_for_user?(current_user)
