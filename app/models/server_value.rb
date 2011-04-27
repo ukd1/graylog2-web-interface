@@ -1,11 +1,11 @@
 class ServerValue
   include Mongoid::Document
 
-  # keys are Strings and defined in blueprint, values are Fixnums and Strings
-  field :info, :type => Hash                 # keys: local_hostname, startup_time, pid, version, env
-  field :messages_total, :type => Hash       # keys: received, persisted
-  field :messages_throughput, :type => Hash  # keys: current, highest, lowest - per minute
-  field :additional_fields, :type => Hash    # for example: user_id => 42, post_id => 6
+  # expected keys and value types are defined in blueprint.rb
+  field :info, :type => Hash
+  field :messages_total, :type => Hash
+  field :messages_throughput, :type => Hash
+  field :additional_fields, :type => Hash
   field :updated_at, :type => Time
 
   %w(info messages_total messages_throughput additional_fields).each do |m|
