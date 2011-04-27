@@ -50,9 +50,9 @@
     </div>
   <% end %>
 
-  <% if ServerValue.ping < 65.seconds.ago and Rails.env != "development" %>
+  <% unless ServerValue.all_alive? %>
     <div id="server-not-running" class="notification">
-      <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
+      <span class="notification-title">Warning!</span> It seems like some of your Graylog2 servers are not running.
     </div>
   <% end %>
 

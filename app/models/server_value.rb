@@ -1,51 +1,28 @@
 class ServerValue
   include Mongoid::Document
 
+  # keys are Strings and defined in blueprint, values are Fixnums and Strings
+  field :info, :type => Hash                 # keys: local_hostname, startup_time, pid, version, env
+  field :messages_total, :type => Hash       # keys: received, persisted
+  field :messages_throughput, :type => Hash  # keys: current, highest, lowest - per minute
+  field :additional_fields, :type => Hash    # for example: user_id => 42, post_id => 6
+  field :updated_at, :type => Time
+
   field :type, :type => String
 
-  def self.throughput
-    val = self.first(:conditions => { "type" => "total_throughput" })
-    if val.blank?
-      { :current => 0, :highest => 0 }
-    else
-      { :current => val.current.to_i, :highest => val.highest.to_i }
-    end
+  def startup_time
+    Time.at(info.try(:fetch, 'startup_time', 0))
   end
 
-  def self.graylog2_version
-    get("graylog2_version")
+  def alive?
+    (updated_at || 0) > 65.seconds.ago
   end
 
-  def self.local_hostname
-    get("local_hostname")
+  def self.all_alive?
+    all.map(&:alive?).reduce(&:and)
   end
 
-  def self.pid
-    get("pid")
+  def self.total_current_messages_throughput
+    all.map(&:messages_throughput).map { |hash| hash.try(:fetch, 'current', nil) }.compact.reduce(&:+)
   end
-
-  def self.jre
-    get("jre")
-  end
-
-  def self.available_processors
-    get("available_processors")
-  end
-
-  def self.startup_time
-    get("startup_time")
-  end
-
-  def self.ping
-    ping = get("ping")
-    ping == "unknown" ? Time.at(0) : Time.at(ping)
-  end
-
-  private
-  def self.get(key)
-    val = self.first(:conditions => { "type" => key })
-
-    val.blank? ? "unknown" : val.value
-  end
-
 end

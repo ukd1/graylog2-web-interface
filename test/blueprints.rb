@@ -44,3 +44,11 @@ end
 HostgroupHost.blueprint do
   hostname { host }
 end
+
+ServerValue.blueprint do
+  info { { 'local_hostname' => 'server.graylog2.org', 'startup_time' => Time.now.to_i, 'pid' => 1234, 'version' => '0.9.9', 'env' => 'JVMs are awesome ;)' } }
+  messages_total { { 'received' => 1000, 'persisted' => 950 } }
+  messages_throughput { { 'current' => 1000, 'highest' => 2000, 'lowest' => 500 } }
+  additional_fields { { 'user_id' => 42, 'post_id' => 6 } }
+  updated_at { Time.now.to_i }
+end
