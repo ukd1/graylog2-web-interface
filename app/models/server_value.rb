@@ -15,11 +15,11 @@ class ServerValue
   end
 
   def updated_at
-    Time.at(read_attribute(:updated_at) || 0)
+    Time.zone.at(read_attribute(:updated_at) || 0)
   end
 
   def startup_time
-    Time.at(info.fetch('startup_time', 0))
+    Time.zone.at(info.fetch('startup_time', 0))
   end
 
   def alive?
@@ -36,6 +36,10 @@ class ServerValue
 
   def self.total_highest_messages_throughput
     aggregate(:messages_throughput, 'highest')
+  end
+
+  def self.remove_dead_servers
+    all.each { |server| server.destroy unless server.alive? }
   end
 
 private

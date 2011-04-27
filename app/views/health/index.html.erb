@@ -26,7 +26,9 @@
       <th>Environment</th>
       <th>Version</th>
       <th>Current throughput</th>
+      <th>Highest throughput</th>
       <th>Additional fields distribution</th>
+      <th>Latest update</th>
     </tr>
   </thead>
   <tbody>
@@ -37,7 +39,9 @@
         <td><%= server.info['env'] %></td>
         <td><%= server.info['version'] %></td>
         <td><%= server.messages_throughput['current'] %></td>
+        <td><%= server.messages_throughput['highest'] %></td>
         <td><%= server.additional_fields.inspect %></td>
+        <td><%= server.updated_at %></td>
       </tr>
     <% end %>
   </tbody>
