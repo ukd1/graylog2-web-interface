@@ -6,7 +6,7 @@ class ServerValue
   field :messages_total, :type => Hash
   field :messages_throughput, :type => Hash
   field :additional_fields, :type => Hash
-  field :updated_at, :type => Time
+  field :updated_at, :type => Fixnum
 
   %w(info messages_total messages_throughput additional_fields).each do |m|
     define_method(m) do
@@ -15,7 +15,7 @@ class ServerValue
   end
 
   def updated_at
-    read_attribute(:updated_at) || Time.at(0)
+    Time.at(read_attribute(:updated_at) || 0)
   end
 
   def startup_time
