@@ -6,6 +6,7 @@ class HealthController < ApplicationController
     @load_flot = true
 
     @used_memory = HistoricServerValue.used_memory(24*60)
+    @servers = ServerValue.all
   end
 
   def currentthroughput

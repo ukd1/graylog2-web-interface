@@ -27,7 +27,7 @@ class ServerValue
   end
 
   def self.all_alive?
-    all.map(&:alive?).reduce(&:and)
+    all.map(&:alive?).reduce(&:&)
   end
 
   def self.total_current_messages_throughput
