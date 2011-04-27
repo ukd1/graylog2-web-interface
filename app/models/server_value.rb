@@ -8,14 +8,22 @@ class ServerValue
   field :additional_fields, :type => Hash    # for example: user_id => 42, post_id => 6
   field :updated_at, :type => Time
 
-  field :type, :type => String
+  %w(info messages_total messages_throughput additional_fields).each do |m|
+    define_method(m) do
+      read_attribute(m) || {}
+    end
+  end
+
+  def updated_at
+    read_attribute(:updated_at) || Time.at(0)
+  end
 
   def startup_time
-    Time.at(info.try(:fetch, 'startup_time', 0))
+    Time.at(info.fetch('startup_time', 0))
   end
 
   def alive?
-    (updated_at || 0) > 65.seconds.ago
+    updated_at > 65.seconds.ago
   end
 
   def self.all_alive?
@@ -23,6 +31,15 @@ class ServerValue
   end
 
   def self.total_current_messages_throughput
-    all.map(&:messages_throughput).map { |hash| hash.try(:fetch, 'current', nil) }.compact.reduce(&:+)
+    aggregate(:messages_throughput, 'current')
+  end
+
+  def self.total_highest_messages_throughput
+    aggregate(:messages_throughput, 'highest')
+  end
+
+private
+  def self.aggregate(field, key)
+    all.map(&field).map { |hash| hash.fetch(key, nil) }.compact.reduce(&:+)
   end
 end
